@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Default mqtt_password is last 8 digits of serial number
+# Default mqtt_password is "password"
 modem_username="admin"
 modem_password="password"
 baseURL='http://192.168.100.1'
 
 # Settings for MQTT mqtt_broker to publish stats
 mqtt_broker="192.168.1.221"
-mqtt_username="hassio-mqtt"
-mqtt_password="hassio-mqtt-password"
+mqtt_username="your_mqtt_username_here"
+mqtt_password="your_mqtt_password_here"
 mqtt_topic="homeassistant/sensor/modemsignals"
 
 # HomeAssistant doesn't expose this to the container so we have to hack it up
