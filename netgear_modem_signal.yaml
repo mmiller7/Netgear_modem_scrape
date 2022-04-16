@@ -71,6 +71,14 @@ sensor:
     unique_id: "modemsignals_webui_login_status"
     state_topic: "homeassistant/sensor/modemsignals/login"
     value_template: "{{ value_json.login }}"
+    
+  # Login Status
+  - platform: mqtt
+    name: "Cable Modem System Up Time"
+    force_update: true
+    unique_id: "modemsignals_system_up_time"
+    state_topic: "homeassistant/sensor/modemsignals/system_up_time"
+    value_template: "{{ value_json.SystemUpTime }}"
 
   # Startup Procedures
   - platform: mqtt
