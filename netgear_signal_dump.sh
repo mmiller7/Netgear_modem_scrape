@@ -182,6 +182,7 @@ downstream_status=$(echo "$result" | tr '\n' ' ' | sed 's/\t//g;s/ //g;s/dBmV//g
 upstream_status=$(echo "$result" | tr '\n' ' ' | sed 's/\t//g;s/ //g;s/dBmV//g;s/dB//g;s/Hz//g;s/<[/]\?strong>//g;s/<![^>]*>//g' | awk -F "<[/]?tabindex=-1>" '{print $7}' | awk -F "</table>" '{print $1}')
 ofdm_downstream_status=$(echo "$result" | tr '\n' ' ' | sed 's/\t//g;s/ //g;s/dBmV//g;s/dB//g;s/Hz//g;s/<[/]\?strong>//g;s/<![^>]*>//g' | awk -F "<[/]?tabindex=-1>" '{print $9}' | awk -F "</table>" '{print $1}')
 ofdm_upstream_status=$(echo "$result" | tr '\n' ' ' | sed 's/\t//g;s/ //g;s/dBmV//g;s/dB//g;s/Hz//g;s/<[/]\?strong>//g;s/<![^>]*>//g' | awk -F "<[/]?tabindex=-1>" '{print $11}' | awk -F "</table>" '{print $1}')
+system_up_time=$(echo "$result" | grep "SystemUpTime" | awk -F "</b>|</font>" '{print $2}')
 
 # Break out by line
 startup_rows=$(echo "$startup_status" | sed 's/^<tr>//g;s/<\/tr>$//g;s/<\/tr><tr[^>]*>/\n/g')
@@ -189,6 +190,7 @@ downstream_rows=$(echo "$downstream_status" | sed 's/^<tr>//g;s/<\/tr>$//g;s/<\/
 upstream_rows=$(echo "$upstream_status" | sed 's/^<tr>//g;s/<\/tr>$//g;s/<\/tr><tr[^>]*>/\n/g')
 ofdm_downstream_rows=$(echo "$ofdm_downstream_status" | sed 's/^<tr>//g;s/<\/tr>$//g;s/<\/tr><tr[^>]*>/\n/g')
 ofdm_upstream_rows=$(echo "$ofdm_upstream_status" | sed 's/^<tr>//g;s/<\/tr>$//g;s/<\/tr><tr[^>]*>/\n/g')
+# Note: system_up_time is a single value and does not need additional parsing
 
 # Break out columns
 
@@ -319,8 +321,8 @@ echo "$ofdm_upstream_rows" | tail -n +3 | while read -r line; do
 	$mqtt_pub_exe -h "$mqtt_broker" -u "$mqtt_username" -P "$mqtt_password" -t "${mqtt_topic}/ofdm_upstream/${counter}" -m "$message"
 done
 
-
-
+# Publish the system up time from the modem
+message="{ \"SystemUpTime\": \"$system_up_time\" }"
+$mqtt_pub_exe -h "$mqtt_broker" -u "$mqtt_username" -P "$mqtt_password" -t "${mqtt_topic}/system_up_time" -m "$message"
 
 #echo ""
-
