@@ -8,6 +8,6 @@ This script should allow you to scrape the modem status data and write it out to
 
 Files:
 
-netgear_modem_signal_dump.sh - the script which logs into tthe modem and scrapes/parses the data publishing JSON to MQTT 
+netgear_modem_signal_dump.sh - the script which logs into the modem and scrapes/parses the data publishing JSON to MQTT 
 
 netgear_modem_signgal.yaml - initial YAML to run the script periodically and import the startup status (I have the sensors for channels my ISP uses filled out, you may need to browse what your ISP offers and review published MQTT data to decide what you want)

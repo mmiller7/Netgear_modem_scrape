@@ -10,843 +10,846 @@ automation:
       - platform: homeassistant
         event: start
       - platform: time_pattern
-        minutes: '/5'
-      - platform: state
-        entity_id:
-          - binary_sensor.http_cable_modem
-          - binary_sensor.ping_atlanticbb_gw
-        to: 'on'
+        minutes: '/10'
+# Optional if you have a sensor to make sure the modem is actually up before running
+#    codition:
+#      - condition: state
+#        entity_id: binary_sensor.http_cable_modem
+#        state: 'on'
 #        for: '00:00:10'
-      - platform: state
-        entity_id:
-          - binary_sensor.http_cable_modem
-          - binary_sensor.ping_atlanticbb_gw
-        to: 'on'
-        for: '00:00:30'
-      - platform: state
-        entity_id:
-          - binary_sensor.http_cable_modem
-          - binary_sensor.ping_atlanticbb_gw
-        to: 'on'
-        for: '00:01:00'
-      - platform: state
-        entity_id:
-          - binary_sensor.http_cable_modem
-          - binary_sensor.ping_atlanticbb_gw
-        to: 'on'
-        for: '00:02:00'
-      - platform: state
-        entity_id:
-          - binary_sensor.http_cable_modem
-          - binary_sensor.ping_atlanticbb_gw
-        to: 'on'
-        for: '00:03:00'
-      - platform: state
-        entity_id: binary_sensor.ping_atlanticbb_gw
-#        for: '00:00:10'
-        to: 'off'
-      - platform: state
-        entity_id: binary_sensor.ping_atlanticbb_gw
-        for: '00:00:30'
-        to: 'off'
-    condition:
-      - condition: state
-        entity_id: binary_sensor.ping_cable_modem
-        state: 'on'
-        for: '00:00:10'
-      - condition: template
-        value_template: "{{ (now() - state_attr('automation.netgear_modem_signal_scrape','last_triggered')).total_seconds() > 15 }}"
     action:
       service: shell_command.netgear_modem_signal_run_scrape
 
 
 
 # Pull in the readings from MQTT
+mqtt:
+  sensor:
+
+    # Login Status
+    - name: "Cable Modem Web-UI Login Status"
+      force_update: true
+      expire_after: 200
+      unique_id: "modemsignals_webui_login_status"
+      state_topic: "homeassistant/sensor/modemsignals/login"
+      value_template: "{{ value_json.login }}"
+
+    # Login Status
+    - name: "Cable Modem System Up Time"
+      force_update: true
+      expire_after: 200
+      unique_id: "modemsignals_system_up_time"
+      state_topic: "homeassistant/sensor/modemsignals/system_up_time"
+      value_template: "{{ value_json.SystemUpTime }}"
+
+    # Startup Procedures
+    - name: "Cable Modem Acquire Downstream Channel"
+      expire_after: 200
+      unique_id: "modemsignals_startup_procedure_acquiredownstreamchannel"
+      state_topic: "homeassistant/sensor/modemsignals/startup_procedure/AcquireDownstreamChannel"
+      value_template: "{{ value_json.comment }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/startup_procedure/AcquireDownstreamChannel"
+
+    - name: "Cable Modem Connectivity State"
+      expire_after: 200
+      unique_id: "modemsignals_startup_procedure_connectivitystate"
+      state_topic: "homeassistant/sensor/modemsignals/startup_procedure/ConnectivityState"
+      value_template: "{{ value_json.comment }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/startup_procedure/ConnectivityState"
+
+    - name: "Cable Modem Boot State"
+      expire_after: 200
+      unique_id: "modemsignals_startup_procedure_bootstate"
+      state_topic: "homeassistant/sensor/modemsignals/startup_procedure/BootState"
+      value_template: "{{ value_json.comment }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/startup_procedure/BootState"
+
+
+
+  # Generated sensors below
+  # -----------------------
+
+    #############
+    # Downstream
+    #############
+
+    # MQTT Inputs
+    - name: "Cable Modem Downstream 1 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/1"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/1"
+    - name: "Cable Modem Downstream 1 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/1"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 1 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/1"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  1 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/1"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 2 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/2"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/2"
+    - name: "Cable Modem Downstream 2 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/2"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 2 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/2"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  2 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/2"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 3 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/3"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/3"
+    - name: "Cable Modem Downstream 3 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/3"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 3 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/3"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  3 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/3"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 4 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/4"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/4"
+    - name: "Cable Modem Downstream 4 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/4"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 4 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/4"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  4 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/4"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 5 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/5"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/5"
+    - name: "Cable Modem Downstream 5 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/5"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 5 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/5"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  5 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/5"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 6 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/6"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/6"
+    - name: "Cable Modem Downstream 6 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/6"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 6 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/6"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  6 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/6"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 7 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/7"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/7"
+    - name: "Cable Modem Downstream 7 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/7"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 7 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/7"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  7 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/7"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 8 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/8"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/8"
+    - name: "Cable Modem Downstream 8 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/8"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 8 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/8"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  8 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/8"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 9 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/9"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/9"
+    - name: "Cable Modem Downstream 9 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/9"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 9 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/9"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  9 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/9"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 10 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/10"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/10"
+    - name: "Cable Modem Downstream 10 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/10"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 10 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/10"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  10 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/10"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 11 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/11"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/11"
+    - name: "Cable Modem Downstream 11 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/11"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 11 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/11"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  11 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/11"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 12 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/12"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/12"
+    - name: "Cable Modem Downstream 12 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/12"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 12 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/12"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  12 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/12"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 13 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/13"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/13"
+    - name: "Cable Modem Downstream 13 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/13"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 13 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/13"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  13 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/13"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 14 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/14"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/14"
+    - name: "Cable Modem Downstream 14 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/14"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 14 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/14"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  14 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/14"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 15 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/15"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/15"
+    - name: "Cable Modem Downstream 15 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/15"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 15 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/15"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  15 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/15"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 16 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/16"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/16"
+    - name: "Cable Modem Downstream 16 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/16"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 16 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/16"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  16 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/16"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 17 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/17"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/17"
+    - name: "Cable Modem Downstream 17 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/17"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 17 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/17"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  17 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/17"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 18 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/18"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/18"
+    - name: "Cable Modem Downstream 18 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/18"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 18 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/18"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  18 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/18"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 19 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/19"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/19"
+    - name: "Cable Modem Downstream 19 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/19"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 19 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/19"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  19 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/19"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 20 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/20"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/20"
+    - name: "Cable Modem Downstream 20 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/20"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 20 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/20"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  20 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/20"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 21 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/21"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/21"
+    - name: "Cable Modem Downstream 21 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/21"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 21 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/21"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  21 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/21"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 22 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/22"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/22"
+    - name: "Cable Modem Downstream 22 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/22"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 22 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/22"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  22 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/22"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 23 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/23"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/23"
+    - name: "Cable Modem Downstream 23 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/23"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 23 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/23"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  23 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/23"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 24 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/24"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/24"
+    - name: "Cable Modem Downstream 24 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/24"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 24 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/24"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  24 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/24"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 25 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/25"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/25"
+    - name: "Cable Modem Downstream 25 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/25"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 25 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/25"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  25 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/25"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 26 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/26"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/26"
+    - name: "Cable Modem Downstream 26 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/26"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 26 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/26"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  26 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/26"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 27 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/27"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/27"
+    - name: "Cable Modem Downstream 27 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/27"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 27 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/27"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  27 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/27"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 28 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/28"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/28"
+    - name: "Cable Modem Downstream 28 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/28"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 28 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/28"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  28 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/28"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 29 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/29"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/29"
+    - name: "Cable Modem Downstream 29 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/29"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 29 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/29"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  29 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/29"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 30 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/30"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/30"
+    - name: "Cable Modem Downstream 30 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/30"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 30 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/30"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  30 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/30"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 31 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/31"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/31"
+    - name: "Cable Modem Downstream 31 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/31"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 31 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/31"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  31 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/31"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - name: "Cable Modem Downstream 32 Power"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/32"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/32"
+    - name: "Cable Modem Downstream 32 SNR"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/32"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - name: "Cable Modem Downstream 32 Corrected"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/32"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - name: "Cable Modem Downstream  32 Uncorrectable"
+      expire_after: 200
+      state_topic: "homeassistant/sensor/modemsignals/downstream/32"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+    - platform: mqtt
+      expire_after: 200
+      name: "Cable Modem Downstream 33 Power"
+      state_topic: "homeassistant/sensor/modemsignals/ofdm_downstream/1"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/ofdm_downstream/1"
+    - platform: mqtt
+      expire_after: 200
+      name: "Cable Modem Downstream 33 SNR"
+      state_topic: "homeassistant/sensor/modemsignals/ofdm_downstream/1"
+      unit_of_measurement: 'dB'
+      value_template: "{{ value_json.SNR_MER }}"
+    - platform: mqtt
+      expire_after: 200
+      name: "Cable Modem Downstream 33 Corrected"
+      state_topic: "homeassistant/sensor/modemsignals/ofdm_downstream/1"
+      unit_of_measurement: 'Corrected Errors'
+      value_template: "{{ value_json.Corrected }}"
+    - platform: mqtt
+      expire_after: 200
+      name: "Cable Modem Downstream  33 Uncorrectable"
+      state_topic: "homeassistant/sensor/modemsignals/ofdm_downstream/1"
+      unit_of_measurement: 'Uncorrectable Errors'
+      value_template: "{{ value_json.Uncorrectable }}"
+
+
+
+    ###########
+    # Upstream
+    ###########
+
+    # MQTT Inputs
+    - name: "Cable Modem Upstream 1 Power"
+      unique_id: "cable_modem_upstream_1_power"
+      state_topic: "homeassistant/sensor/modemsignals/upstream/1"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/upstream/1"
+
+    - name: "Cable Modem Upstream 2 Power"
+      unique_id: "cable_modem_upstream_2_power"
+      state_topic: "homeassistant/sensor/modemsignals/upstream/2"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/upstream/2"
+
+    - name: "Cable Modem Upstream 3 Power"
+      unique_id: "cable_modem_upstream_3_power"
+      state_topic: "homeassistant/sensor/modemsignals/upstream/3"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/upstream/3"
+
+    - name: "Cable Modem Upstream 4 Power"
+      unique_id: "cable_modem_upstream_4_power"
+      state_topic: "homeassistant/sensor/modemsignals/upstream/4"
+      unit_of_measurement: 'dBmV'
+      value_template: "{{ value_json.Power }}"
+      json_attributes_topic: "homeassistant/sensor/modemsignals/upstream/4"
+
+
+
 sensor:
-
-  # Login Status
-  - platform: mqtt
-    name: "Cable Modem Web-UI Login Status"
-    force_update: true
-    unique_id: "modemsignals_webui_login_status"
-    state_topic: "homeassistant/sensor/modemsignals/login"
-    value_template: "{{ value_json.login }}"
-    
-  # System Up Time
-  - platform: mqtt
-    name: "Cable Modem System Up Time"
-    force_update: true
-    unique_id: "modemsignals_system_up_time"
-    state_topic: "homeassistant/sensor/modemsignals/system_up_time"
-    value_template: "{{ value_json.SystemUpTime }}"
-
-  # Startup Procedures
-  - platform: mqtt
-    name: "Cable Modem Acquire Downstream Channel"
-    unique_id: "modemsignals_startup_procedure_acquiredownstreamchannel"
-    state_topic: "homeassistant/sensor/modemsignals/startup_procedure/AcquireDownstreamChannel"
-    value_template: "{{ value_json.comment }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/startup_procedure/AcquireDownstreamChannel"
-
-  - platform: mqtt
-    name: "Cable Modem Connectivity State"
-    unique_id: "modemsignals_startup_procedure_connectivitystate"
-    state_topic: "homeassistant/sensor/modemsignals/startup_procedure/ConnectivityState"
-    value_template: "{{ value_json.comment }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/startup_procedure/ConnectivityState"
-
-  - platform: mqtt
-    name: "Cable Modem Boot State"
-    unique_id: "modemsignals_startup_procedure_bootstate"
-    state_topic: "homeassistant/sensor/modemsignals/startup_procedure/BootState"
-    value_template: "{{ value_json.comment }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/startup_procedure/BootState"
-
-
-
-# Generated sensors below
-# -----------------------
-
-
-
-
-
-
 
   #############
   # Downstream
   #############
-
-  # MQTT Inputs
-  - platform: mqtt
-    name: "Cable Modem Downstream 1 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/1"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/1"
-  - platform: mqtt
-    name: "Cable Modem Downstream 1 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/1"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 1 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/1"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  1 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/1"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 2 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/2"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/2"
-  - platform: mqtt
-    name: "Cable Modem Downstream 2 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/2"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 2 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/2"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  2 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/2"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 3 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/3"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/3"
-  - platform: mqtt
-    name: "Cable Modem Downstream 3 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/3"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 3 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/3"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  3 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/3"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 4 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/4"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/4"
-  - platform: mqtt
-    name: "Cable Modem Downstream 4 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/4"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 4 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/4"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  4 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/4"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 5 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/5"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/5"
-  - platform: mqtt
-    name: "Cable Modem Downstream 5 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/5"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 5 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/5"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  5 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/5"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 6 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/6"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/6"
-  - platform: mqtt
-    name: "Cable Modem Downstream 6 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/6"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 6 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/6"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  6 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/6"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 7 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/7"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/7"
-  - platform: mqtt
-    name: "Cable Modem Downstream 7 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/7"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 7 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/7"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  7 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/7"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 8 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/8"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/8"
-  - platform: mqtt
-    name: "Cable Modem Downstream 8 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/8"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 8 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/8"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  8 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/8"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 9 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/9"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/9"
-  - platform: mqtt
-    name: "Cable Modem Downstream 9 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/9"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 9 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/9"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  9 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/9"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 10 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/10"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/10"
-  - platform: mqtt
-    name: "Cable Modem Downstream 10 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/10"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 10 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/10"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  10 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/10"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 11 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/11"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/11"
-  - platform: mqtt
-    name: "Cable Modem Downstream 11 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/11"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 11 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/11"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  11 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/11"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 12 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/12"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/12"
-  - platform: mqtt
-    name: "Cable Modem Downstream 12 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/12"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 12 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/12"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  12 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/12"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 13 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/13"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/13"
-  - platform: mqtt
-    name: "Cable Modem Downstream 13 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/13"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 13 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/13"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  13 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/13"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 14 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/14"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/14"
-  - platform: mqtt
-    name: "Cable Modem Downstream 14 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/14"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 14 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/14"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  14 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/14"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 15 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/15"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/15"
-  - platform: mqtt
-    name: "Cable Modem Downstream 15 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/15"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 15 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/15"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  15 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/15"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 16 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/16"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/16"
-  - platform: mqtt
-    name: "Cable Modem Downstream 16 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/16"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 16 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/16"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  16 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/16"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 17 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/17"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/17"
-  - platform: mqtt
-    name: "Cable Modem Downstream 17 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/17"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 17 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/17"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  17 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/17"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 18 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/18"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/18"
-  - platform: mqtt
-    name: "Cable Modem Downstream 18 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/18"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 18 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/18"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  18 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/18"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 19 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/19"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/19"
-  - platform: mqtt
-    name: "Cable Modem Downstream 19 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/19"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 19 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/19"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  19 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/19"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 20 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/20"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/20"
-  - platform: mqtt
-    name: "Cable Modem Downstream 20 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/20"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 20 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/20"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  20 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/20"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 21 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/21"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/21"
-  - platform: mqtt
-    name: "Cable Modem Downstream 21 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/21"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 21 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/21"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  21 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/21"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 22 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/22"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/22"
-  - platform: mqtt
-    name: "Cable Modem Downstream 22 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/22"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 22 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/22"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  22 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/22"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 23 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/23"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/23"
-  - platform: mqtt
-    name: "Cable Modem Downstream 23 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/23"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 23 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/23"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  23 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/23"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 24 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/24"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/24"
-  - platform: mqtt
-    name: "Cable Modem Downstream 24 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/24"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 24 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/24"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  24 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/24"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 25 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/25"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/25"
-  - platform: mqtt
-    name: "Cable Modem Downstream 25 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/25"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 25 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/25"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  25 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/25"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 26 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/26"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/26"
-  - platform: mqtt
-    name: "Cable Modem Downstream 26 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/26"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 26 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/26"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  26 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/26"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 27 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/27"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/27"
-  - platform: mqtt
-    name: "Cable Modem Downstream 27 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/27"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 27 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/27"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  27 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/27"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 28 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/28"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/28"
-  - platform: mqtt
-    name: "Cable Modem Downstream 28 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/28"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 28 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/28"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  28 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/28"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 29 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/29"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/29"
-  - platform: mqtt
-    name: "Cable Modem Downstream 29 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/29"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 29 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/29"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  29 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/29"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 30 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/30"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/30"
-  - platform: mqtt
-    name: "Cable Modem Downstream 30 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/30"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 30 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/30"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  30 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/30"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 31 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/31"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/31"
-  - platform: mqtt
-    name: "Cable Modem Downstream 31 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/31"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 31 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/31"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  31 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/31"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 32 Power"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/32"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/downstream/32"
-  - platform: mqtt
-    name: "Cable Modem Downstream 32 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/32"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 32 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/32"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  32 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/downstream/32"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
-  - platform: mqtt
-    name: "Cable Modem Downstream 33 Power"
-    state_topic: "homeassistant/sensor/modemsignals/ofdm_downstream/1"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/ofdm_downstream/1"
-  - platform: mqtt
-    name: "Cable Modem Downstream 33 SNR"
-    state_topic: "homeassistant/sensor/modemsignals/ofdm_downstream/1"
-    unit_of_measurement: 'dB'
-    value_template: "{{ value_json.SNR_MER }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream 33 Corrected"
-    state_topic: "homeassistant/sensor/modemsignals/ofdm_downstream/1"
-    unit_of_measurement: 'Corrected Errors'
-    value_template: "{{ value_json.Corrected }}"
-  - platform: mqtt
-    name: "Cable Modem Downstream  33 Uncorrectable"
-    state_topic: "homeassistant/sensor/modemsignals/ofdm_downstream/1"
-    unit_of_measurement: 'Uncorrectable Errors'
-    value_template: "{{ value_json.Uncorrectable }}"
-
+  
   # Averages
-  - platform: min_max
-    name: "Cable Modem Downstream Avg Power"
+  - name: "Cable Modem Downstream Avg Power"
+    platform: min_max
     type: mean
     entity_ids:
       - sensor.cable_modem_downstream_1_power
@@ -882,8 +885,8 @@ sensor:
       - sensor.cable_modem_downstream_31_power
       - sensor.cable_modem_downstream_32_power
       - sensor.cable_modem_downstream_33_power
-  - platform: min_max
-    name: "Cable Modem Downstream Avg SNR"
+  - name: "Cable Modem Downstream Avg SNR"
+    platform: min_max
     type: mean
     entity_ids:
       - sensor.cable_modem_downstream_1_snr
@@ -919,8 +922,8 @@ sensor:
       - sensor.cable_modem_downstream_31_snr
       - sensor.cable_modem_downstream_32_snr
       - sensor.cable_modem_downstream_33_snr
-  - platform: min_max
-    name: "Cable Modem Downstream Avg Corrected"
+  - name: "Cable Modem Downstream Avg Corrected"
+    platform: min_max
     type: mean
     entity_ids:
       - sensor.cable_modem_downstream_1_corrected
@@ -956,8 +959,8 @@ sensor:
       - sensor.cable_modem_downstream_31_corrected
       - sensor.cable_modem_downstream_32_corrected
       - sensor.cable_modem_downstream_33_corrected
-  - platform: min_max
-    name: "Cable Modem Downstream Avg Uncorrectable"
+  - name: "Cable Modem Downstream Avg Uncorrectable"
+    platform: min_max
     type: mean
     entity_ids:
       - sensor.cable_modem_downstream_1_uncorrectable
@@ -995,8 +998,8 @@ sensor:
       - sensor.cable_modem_downstream_33_uncorrectable
 
   # Minimums
-  - platform: min_max
-    name: "Cable Modem Downstream Min Power"
+  - name: "Cable Modem Downstream Min Power"
+    platform: min_max
     type: min
     entity_ids:
       - sensor.cable_modem_downstream_1_power
@@ -1032,8 +1035,8 @@ sensor:
       - sensor.cable_modem_downstream_31_power
       - sensor.cable_modem_downstream_32_power
       - sensor.cable_modem_downstream_33_power
-  - platform: min_max
-    name: "Cable Modem Downstream Min SNR"
+  - name: "Cable Modem Downstream Min SNR"
+    platform: min_max
     type: min
     entity_ids:
       - sensor.cable_modem_downstream_1_snr
@@ -1069,8 +1072,8 @@ sensor:
       - sensor.cable_modem_downstream_31_snr
       - sensor.cable_modem_downstream_32_snr
       - sensor.cable_modem_downstream_33_snr
-  - platform: min_max
-    name: "Cable Modem Downstream Min Corrected"
+  - name: "Cable Modem Downstream Min Corrected"
+    platform: min_max
     type: min
     entity_ids:
       - sensor.cable_modem_downstream_1_corrected
@@ -1106,8 +1109,8 @@ sensor:
       - sensor.cable_modem_downstream_31_corrected
       - sensor.cable_modem_downstream_32_corrected
       - sensor.cable_modem_downstream_33_corrected
-  - platform: min_max
-    name: "Cable Modem Downstream Min Uncorrectable"
+  - name: "Cable Modem Downstream Min Uncorrectable"
+    platform: min_max
     type: min
     entity_ids:
       - sensor.cable_modem_downstream_1_uncorrectable
@@ -1145,8 +1148,8 @@ sensor:
       - sensor.cable_modem_downstream_33_uncorrectable
 
   # Maximums
-  - platform: min_max
-    name: "Cable Modem Downstream Max Power"
+  - name: "Cable Modem Downstream Max Power"
+    platform: min_max
     type: max
     entity_ids:
       - sensor.cable_modem_downstream_1_power
@@ -1182,8 +1185,8 @@ sensor:
       - sensor.cable_modem_downstream_31_power
       - sensor.cable_modem_downstream_32_power
       - sensor.cable_modem_downstream_33_power
-  - platform: min_max
-    name: "Cable Modem Downstream Max SNR"
+  - name: "Cable Modem Downstream Max SNR"
+    platform: min_max
     type: max
     entity_ids:
       - sensor.cable_modem_downstream_1_snr
@@ -1219,8 +1222,8 @@ sensor:
       - sensor.cable_modem_downstream_31_snr
       - sensor.cable_modem_downstream_32_snr
       - sensor.cable_modem_downstream_33_snr
-  - platform: min_max
-    name: "Cable Modem Downstream Max Corrected"
+  - name: "Cable Modem Downstream Max Corrected"
+    platform: min_max
     type: max
     entity_ids:
       - sensor.cable_modem_downstream_1_corrected
@@ -1256,8 +1259,8 @@ sensor:
       - sensor.cable_modem_downstream_31_corrected
       - sensor.cable_modem_downstream_32_corrected
       - sensor.cable_modem_downstream_33_corrected
-  - platform: min_max
-    name: "Cable Modem Downstream Max Uncorrectable"
+  - name: "Cable Modem Downstream Max Uncorrectable"
+    platform: min_max
     type: max
     entity_ids:
       - sensor.cable_modem_downstream_1_uncorrectable
@@ -1300,42 +1303,9 @@ sensor:
   # Upstream
   ###########
 
-  # MQTT Inputs
-  - platform: mqtt
-    name: "Cable Modem Upstream 1 Power"
-    unique_id: "cable_modem_upstream_1_power"
-    state_topic: "homeassistant/sensor/modemsignals/upstream/1"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/upstream/1"
-
-  - platform: mqtt
-    name: "Cable Modem Upstream 2 Power"
-    unique_id: "cable_modem_upstream_2_power"
-    state_topic: "homeassistant/sensor/modemsignals/upstream/2"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/upstream/2"
-
-  - platform: mqtt
-    name: "Cable Modem Upstream 3 Power"
-    unique_id: "cable_modem_upstream_3_power"
-    state_topic: "homeassistant/sensor/modemsignals/upstream/3"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/upstream/3"
-
-  - platform: mqtt
-    name: "Cable Modem Upstream 4 Power"
-    unique_id: "cable_modem_upstream_4_power"
-    state_topic: "homeassistant/sensor/modemsignals/upstream/4"
-    unit_of_measurement: 'dBmV'
-    value_template: "{{ value_json.Power }}"
-    json_attributes_topic: "homeassistant/sensor/modemsignals/upstream/4"
-
   # Averages
-  - platform: min_max
-    name: "Cable Modem Upstream Avg Power"
+  - name: "Cable Modem Upstream Avg Power"
+    platform: min_max
     type: mean
     entity_ids:
       - sensor.cable_modem_upstream_1_power
@@ -1344,8 +1314,8 @@ sensor:
       - sensor.cable_modem_upstream_4_power
 
   # Minimums
-  - platform: min_max
-    name: "Cable Modem Upstream Min Power"
+  - name: "Cable Modem Upstream Min Power"
+    platform: min_max
     type: min
     entity_ids:
       - sensor.cable_modem_upstream_1_power
@@ -1354,8 +1324,8 @@ sensor:
       - sensor.cable_modem_upstream_4_power
 
   # Maximums
-  - platform: min_max
-    name: "Cable Modem Upstream Max Power"
+  - name: "Cable Modem Upstream Max Power"
+    platform: min_max
     type: max
     entity_ids:
       - sensor.cable_modem_upstream_1_power
